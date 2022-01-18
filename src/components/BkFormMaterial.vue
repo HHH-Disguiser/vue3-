@@ -1,5 +1,5 @@
 <template>
-   <!-- :props 的值没绑定对-->
+    <!-- :props 的值没绑定对-->
     <el-form-item :label="materialConfig.label"
                   :props="name">
         <!-- 输入框 -->
@@ -10,8 +10,7 @@
 
         <!-- select 下拉框 -->
         <template v-else-if="type === 'select'">
-            <el-select v-model="formParams[name]"
-                      >
+            <el-select v-model="formParams[name]">
                 <el-option v-for="options in materialConfig.options"
                            :key="options.value"
                            :label="setMaterialOptionsLabelByConfig(options, 'label')"
@@ -62,17 +61,53 @@ export default {
         },
     },
     components: { ElInput, ElSelect, ElOption },
-    setup(props) {
-        console.log('子组件formParams',props)
-        // 重新将materialConfig的属性解构赋值，避免在模板中写太多重复字段
-        const { name, type, extraFields, options } = props.materialConfig;
+    setup(props, ctx) {
+        console.log('子组件formParams', props, 'this', ctx);
+        const { name, type, extraFields, options, http } = props.materialConfig;
         const state = reactive({
-            type: type, //组件类型
-            name: name,
+            materialParam: props.formParams[name],
+            name: name, // 组件唯一标识
+            type: type, // 组件类型
+            extraFields: extraFields, // 额外自定义字段
             materialConfig: props.materialConfig,
             formParams: props.formParams,
             getMergedObject: getMergedObject,
+            optionsLabelList: [], // 从options里找到value对应的label组成的数组
+            materialOptionsLabel: '', // 从options里找到value对应的label，用于只读时显示
+            // 需要初始化options字段的type类型
+            optionsTypeList: ['select', 'search', 'autocomplete', 'checkbox', 'radio', 'cascader', 'transfer'],
+            typeArrayList: ['cascader', 'checkbox', 'transfer', 'areaselect', 'listselect', 'tag'], // 数据类型为数组的列表
         });
+
+        onBeforeUnmount(() => {
+            initConfig();
+        });
+
+        /**
+         * 初始化配置
+         * @param {Object} materialConfigF  元组件配置
+         */
+        const initConfig = () => {
+            const { materialConfig, formParams } = props;
+            const { http, type, name, disabled, depend } = materialConfig;
+            const nullValue = this.typeArrayList.includes(type) ? [] : '';
+            let value = materialConfig.value !== undefined ? materialConfig.value : nullValue;
+            value =
+                formParams[name] !== undefined && formParams[name] !== null && formParams[name] !== ''
+                    ? formParams[name]
+                    : value;
+
+            // 添加value监控值  作用就是为了给formParams赋值
+            // TODO vue3里面怎么去深层改数据
+            if (name) {
+                //formParams[name] = value;
+                Reflect.set(formParams, name, value);
+            }
+
+            if (!http || !http.url) return;
+
+            // TODO v1.0版本暂时不处理select 下拉框自带默认值的情况
+        };
 
         /**
          * @Description 根据配置的属性获取数据对象的值

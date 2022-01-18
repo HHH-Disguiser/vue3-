@@ -5,8 +5,7 @@
                  :model="formParams"
                  label-width="120px">
             <!-- 表单组，可以配置多个表单组 -->
-
-            <div>
+            <!-- <div>
                 <div>
                     <el-row>
                         <el-col>
@@ -21,7 +20,7 @@
                         </el-col>
                     </el-row>
                 </div>
-            </div>
+            </div> -->
 
             <div v-for="dataConfig in formConfig.data">
                 <!-- 开始处理表单项 -->
@@ -90,7 +89,7 @@ export default defineComponent({
         },
     },
     setup(props, ctx) {
-   
+        console.log('bk-form', props);
         const state = reactive({
             isHasChildren: false,
             getMergedObject: getMergedObject,
@@ -105,6 +104,13 @@ export default defineComponent({
                 desc: '',
             },
             formConfig: props.formConfig,
+            /**
+             * TODO  要么直接在这里就把formParams 处理成
+             * {
+             *  inputDemo:'',
+             *  input1:''
+             * }
+             */
             formParams: {}, // 表单的所有参数集合
             materialConfigs: [], // 将formConfig转化后的一维元组件配置数组，拿掉了data这一层
         });
@@ -121,9 +127,13 @@ export default defineComponent({
             console.log('formParams===form', state.formParams);
         });
 
-        watch(state.formParams, (newVal, oldVal) => {
-           console.log('表单值==formParams',newVal)
-        });
+        watch(
+            state.formParams,
+            (newVal, oldVal) => {
+                console.log('表单值==formParams', newVal);
+            },
+            { deep: true, immediate: true }
+        );
 
         /**
          * 将formConfig的二维数组配置转化为一维数组materialConfigs
@@ -149,7 +159,14 @@ export default defineComponent({
                     });
                 }
             });
-            console.log('调用', state.materialConfigs);
+
+            // 处理formParams的格式
+            state.materialConfigs.forEach((materialConfigsITEM) => {
+                const { name } = materialConfigsITEM;
+                if (!state.formParams[name]) {
+                    state.formParams[name] = '';
+                }
+            });
         };
 
         onMounted(() => {
@@ -161,7 +178,7 @@ export default defineComponent({
          */
         const formatFormParams = () => {
             const { formParams } = state;
-            const params = {};
+            const params: any = {};
 
             state.materialConfigs.forEach((materialConfig) => {
                 const { name, type, options, extraFields, props, noSubmit, toString, objToString, separator } =
@@ -182,7 +199,7 @@ export default defineComponent({
                     // 将数组值转化为数组字符串
                     params[name] = value.join(',');
                     if (params[extraFields] && Array.isArray(params[extraFields])) {
-                        const arrExtra = [];
+                        const arrExtra: any = [];
                         params[extraFields].forEach((item) => {
                             if (item) arrExtra.push(item);
                         });

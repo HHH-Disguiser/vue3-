@@ -102,7 +102,7 @@ export default {
         const handleSearch = () => {
             console.log('formRefs>>>>', formRefs.value, formRefs.value.formParams);
             state.searchParams = formRefs.value.formatFormParams();
-            console.log(' state.searchParams', state.searchParams);
+            console.log(' state.searchParams', state.searchParams,);
             // 请求接口
         };
 
