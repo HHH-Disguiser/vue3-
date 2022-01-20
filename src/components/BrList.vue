@@ -36,6 +36,21 @@
                 </template>
             </MyBkForm>
         </section>
+        <section>
+            <!-- 表格区域 -->
+            <div ref="table"
+                 class="table-wrapper">
+                <el-table ref="list"
+                          :data="tableData">
+                    <template v-if="Array.isArray(tableConfig.data)">
+                        <template v-for="item in tableConfig.data">
+                            <!-- 这里只暂时处理默认状态 -->
+                            <RecursiveTitle :data="item" />
+                        </template>
+                    </template>
+                </el-table>
+            </div>
+        </section>
     </div>
 </template>
 
@@ -54,15 +69,19 @@ import {
     onBeforeUnmount,
     toRef,
     toRefs,
+    nextTick,
 } from 'vue';
 import MyBkForm from './BkForm.vue';
-import { ElButton } from 'element-plus';
+import RecursiveTitle from './RecursiveTitle.vue';
+import { ElButton, ElTable } from 'element-plus';
 import { getMergedObject } from '../utils/util';
 export default {
     name: 'BkList',
     components: {
         MyBkForm,
         ElButton,
+        ElTable,
+        RecursiveTitle,
     },
     props: {
         //搜索查询参数配置
@@ -70,17 +89,39 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        // 表格配置
+        tableConfig: {
+            type: Object,
+            required: true,
+            default: () => ({}),
+        },
     },
     setup(props) {
         /**
          * reactive  响应式  proxy  针对对象
          * */
+        const { tableConfig } = props;
+        console.log('tableConfig>>', props);
+        const listDataProps = Object.assign({
+            // 对应字段
+            data: 'data',
+            pageNumber: 'pageNumber',
+            pageSize: 'pageSize',
+            results: 'results',
+            message: 'message',
+            totalCount: 'totalCount',
+            // 游标分页
+            cursorCode: 'cursorCode',
+        });
         const state = reactive({
             isHasChildren: false,
             searchVisible: '', //筛选项隐藏
             getMergedObject: getMergedObject,
             searchConfig: props.searchConfig,
             searchParams: {}, //当前搜索参数集合
+            listDataProps,
+            tableConfig, //表格数据
+            tableData: tableConfig.data,
         });
 
         const formRefs = ref<any>(null);
@@ -92,18 +133,19 @@ export default {
         const draw = ref(true);
 
         // 重置
-        const handleClear = () => {
+        const handleClear = async () => {
             formRefs.value.resetFormParams();
             state.searchParams = formRefs.value.formatFormParams();
-            // 请求接口
+            await nextTick();
+            getTableData();
         };
 
         //查询  formRefs.value获取子组件中的属性 && 方法
         const handleSearch = () => {
             console.log('formRefs>>>>', formRefs.value, formRefs.value.formParams);
             state.searchParams = formRefs.value.formatFormParams();
-            console.log(' state.searchParams', state.searchParams,);
-            // 请求接口
+            console.log(' state.searchParams', state.searchParams);
+            getTableData();
         };
 
         //展开
@@ -112,6 +154,16 @@ export default {
         watchEffect(() => {
             console.log('watchEffect==list', props.searchConfig);
         });
+
+        /**
+         * 获取列表数据
+         */
+        const getTableData = () => {
+            const { tableConfig } = state;
+            if (!tableConfig.http || !tableConfig.http.url) return;
+            const { url, method, onSuccess, onFaild } = tableConfig.http;
+            const { data, results, totalCount } = listDataProps;
+        };
 
         return {
             draw,
@@ -125,3 +177,6 @@ export default {
     },
 };
 </script>
+<style scope lang='scss'>
+@import './index.scss';
+</style>

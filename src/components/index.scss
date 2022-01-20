@@ -1,0 +1,167 @@
+@import './variable';
+
+.list-wrapper {
+    line-height: 1.5;
+
+    // 页面标题样式
+    .title-wrapper {
+        padding: 22px 0 16px 16px;
+        font-size: 18px;
+        color: $--color-text-primary;
+        border-bottom: 2px solid $--border-color-light;
+    }
+
+    .list-internal-wrapper {
+        padding: 0 16px;
+    }
+
+    .screen-wrapper {
+        margin-bottom: 15px;
+    }
+
+    // 筛选区域样式
+    &>.form-wrapper {
+        margin-top: 24px;
+        border-bottom: 1px solid $--border-color-extra-light;
+    }
+
+    .el-tabs__header {
+        margin: 0;
+    }
+
+    .el-tabs__item {
+        height: 46px;
+        line-height: 46px;
+    }
+
+    .search-btn-wrapper {
+        text-align: right;
+        margin-bottom: 16px;
+
+        .el-button {
+            font-size: 13px;
+        }
+    }
+
+    // 按钮区域样式
+    .btn-wrapper {
+        font-size: 0;
+        margin: 25px 0 16px 0;
+    }
+
+    .btn-wrapper-left {
+        text-align: left;
+    }
+
+    .btn-wrapper-right {
+        text-align: right;
+    }
+
+    .btn-item+.btn-item {
+        margin-left: 10px;
+    }
+
+    .el-upload-list {
+        display: none;
+    }
+
+    // 表格区域样式
+    .table-btn-item .el-button,
+    .table-btn-item {
+        padding: 0;
+        margin-bottom: 0;
+        line-height: 23px;
+
+        .el-button {
+            // 功能按钮
+            border: 0 none;
+            background: none;
+        }
+    }
+
+    .el-table {
+        .cell {
+            text-align: center;
+        }
+
+        .el-button+.el-button {
+            margin: 0 5px;
+        }
+
+        // 临时方案
+        .el-table__empty-text {
+            line-height: 60px;
+        }
+    }
+
+    .el-table--border {
+        border-right: solid 1px $--border-color-lighter !important;
+    }
+
+    .el-table--border .el-table__row td:last-child {
+        border-right: none;
+    }
+
+    .table-wrapper {
+        .thumbnail .img {
+            width: 100%;
+        }
+
+        .el-form-item {
+            margin-bottom: 0;
+        }
+    }
+
+    .additional-column {
+        color: $--color-text-regular;
+    }
+
+    // 分页区域样式
+    .pagination-wrapper {
+        margin: 20px 0;
+        text-align: center;
+    }
+
+    .noniusPagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 0;
+
+        .current,
+        .index {
+            font-size: 14px;
+            color: $--color-text-regular;
+        }
+
+        .current {
+            margin-right: 15px;
+
+            &:not(:first-of-type) {
+                margin-left: 15px;
+            }
+        }
+
+        .index {
+            cursor: pointer;
+        }
+    }
+
+    &.list-tree .el-table td:first-of-type .cell {
+        text-align: left;
+    }
+}
+
+// 全局覆盖表格样式
+.el-table th,
+.el-table td {
+    padding: 10px 0;
+}
+
+.el-table th {
+    background-color: $--background-color-base;
+}
+
+.el-table thead {
+    color: $--color-text-primary;
+}

@@ -1,6 +1,7 @@
 <template>
     <div>
-        <BkList :searchConfig="searchConfig">
+        <BkList :searchConfig="searchConfig"
+                :tableConfig="tableConfig">
             <template v-slot:tips> </template>
         </BkList>
     </div>
@@ -8,7 +9,7 @@
 
 <script lang="ts">
 import BkList from '@/components/BrList.vue';
-import { onMounted, reactive, toRefs } from 'vue';
+import { reactive, toRefs } from 'vue';
 
 export default {
     name: 'Home',
@@ -61,27 +62,29 @@ export default {
                     },
                 ],
             },
-            gameList: [
-                {
-                    name_N: '王者',
-                    idD: 'a1_A',
+            tableConfig: {
+                http: {
+                    url: '/api/page-list',
                 },
-                {
-                    name_N: '吃鸡',
-                    idD: 'a2B',
-                },
-            ],
+                data: [
+                    {
+                        name: 'field1',
+                        label: '字段1',
+                        visible:true,
+                    },
+                    {
+                        name: 'field2',
+                        label: '字段2',
+                        visible:true,
+                    },
+                    {
+                        name: 'field3',
+                        label: '字段3',
+                        visible:true,
+                    },
+                ],
+            },
         });
-        function apiListProxy(target: any) {
-            return new Proxy(target, {
-                set: function (item, property, value, itemProxy) {
-                   return item[property] = '123';
-                },
-            });
-        }
-
-        state.gameList.map(apiListProxy);
-        console.log('state.gameList', state.gameList);
         return {
             ...toRefs(state),
         };

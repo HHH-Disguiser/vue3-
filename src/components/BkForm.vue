@@ -5,23 +5,6 @@
                  :model="formParams"
                  label-width="120px">
             <!-- 表单组，可以配置多个表单组 -->
-            <!-- <div>
-                <div>
-                    <el-row>
-                        <el-col>
-                            <el-form-item label="邮箱"
-                                          prop="email">
-                                <div>
-                                    <el-input v-model="formParams.emailssss"
-                                              type="text"
-                                              placeholder="请输入邮箱地址"></el-input>
-                                </div>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                </div>
-            </div> -->
-
             <div v-for="dataConfig in formConfig.data">
                 <!-- 开始处理表单项 -->
                 <div v-if="Array.isArray(dataConfig.data)"
@@ -89,7 +72,6 @@ export default defineComponent({
         },
     },
     setup(props, ctx) {
-        console.log('bk-form', props);
         const state = reactive({
             isHasChildren: false,
             getMergedObject: getMergedObject,
@@ -122,7 +104,11 @@ export default defineComponent({
         const draw = ref(true);
 
         // TODO 这里思考 watch 与 watchEffect的区别
-        //监听formParams
+        /**
+         * watchEffect 在组件初始化的时候会执行一次  回调函数值中收集到的数据发生变化了则再执行
+         * watch 监听指定的依赖数据源 ，watchEffect不需要指定监听数据源
+         * watch 可以监听到新旧值
+        */
         watchEffect(() => {
             console.log('formParams===form', state.formParams);
         });

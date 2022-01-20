@@ -90,7 +90,7 @@ export default {
         const initConfig = () => {
             const { materialConfig, formParams } = props;
             const { http, type, name, disabled, depend } = materialConfig;
-            const nullValue = this.typeArrayList.includes(type) ? [] : '';
+            const nullValue = state.typeArrayList.includes(type) ? [] : '';
             let value = materialConfig.value !== undefined ? materialConfig.value : nullValue;
             value =
                 formParams[name] !== undefined && formParams[name] !== null && formParams[name] !== ''
@@ -100,7 +100,6 @@ export default {
             // 添加value监控值  作用就是为了给formParams赋值
             // TODO vue3里面怎么去深层改数据
             if (name) {
-                //formParams[name] = value;
                 Reflect.set(formParams, name, value);
             }
 
