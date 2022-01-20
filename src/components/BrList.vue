@@ -50,6 +50,16 @@
                     </template>
                 </el-table>
             </div>
+            <!-- 分页区域 -->
+            <div ref="pagination"
+                 v-if="tableConfig.http && tableConfig.http"
+                 class="pagination-wrapper">
+                <el-pagination background
+                               layout="prev, pager, next"
+                               :total="1000">
+                </el-pagination>
+
+            </div>
         </section>
     </div>
 </template>
@@ -73,7 +83,7 @@ import {
 } from 'vue';
 import MyBkForm from './BkForm.vue';
 import RecursiveTitle from './RecursiveTitle.vue';
-import { ElButton, ElTable } from 'element-plus';
+import { ElButton, ElTable, ElPagination } from 'element-plus';
 import { getMergedObject } from '../utils/util';
 export default {
     name: 'BkList',
@@ -82,6 +92,7 @@ export default {
         ElButton,
         ElTable,
         RecursiveTitle,
+        ElPagination,
     },
     props: {
         //搜索查询参数配置
@@ -122,6 +133,12 @@ export default {
             listDataProps,
             tableConfig, //表格数据
             tableData: tableConfig.data,
+            // 分页数据
+            paginationSetting: {
+                [listDataProps.pageNumber]: 1, // 当前页
+                [listDataProps.pageSize]: (tableConfig && tableConfig.size) || 20, // 每页长度
+            },
+            totalCount: 0, // 总数
         });
 
         const formRefs = ref<any>(null);
