@@ -35,6 +35,18 @@
                     </div>
                 </template>
             </MyBkForm>
+
+            <!-- 功能按妞区域 -->
+            <div v-if="buttonConfig && Array.isArray(buttonConfig.data)"
+                 :class="['btn-wrapper',
+                              buttonConfig.direction ? `btn-wrapper-${buttonConfig.direction}` : 'btn-wrapper-right']">
+                <div v-for="(item, i) in buttonConfig.data">
+                    <BkButton :key="item.name || i"
+                              :dialogConfig="dialogConfig"
+                              :dialogVisible="dialogVisible"
+                              v-bind="item" />
+                </div>
+            </div>
         </section>
         <section>
             <!-- 表格区域 -->
@@ -65,23 +77,9 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive,
-    computed,
-    ref,
-    watchEffect,
-    watch,
-    onMounted,
-    onBeforeMount,
-    onBeforeUpdate,
-    onUpdated,
-    onUnmounted,
-    onBeforeUnmount,
-    toRef,
-    toRefs,
-    nextTick,
-} from 'vue';
+import { reactive, ref, watchEffect, toRefs, nextTick } from 'vue';
 import MyBkForm from './BkForm.vue';
+import BkButton from './Button.vue';
 import RecursiveTitle from './RecursiveTitle.vue';
 import { ElButton, ElTable, ElPagination } from 'element-plus';
 import { getMergedObject } from '../utils/util';
@@ -93,6 +91,7 @@ export default {
         ElTable,
         RecursiveTitle,
         ElPagination,
+        BkButton,
     },
     props: {
         //搜索查询参数配置
@@ -106,13 +105,22 @@ export default {
             required: true,
             default: () => ({}),
         },
+        //弹窗配置
+        dialogConfig: {
+            type: Object,
+            default: () => ({}),
+        },
+        buttonConfig: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup(props) {
         /**
          * reactive  响应式  proxy  针对对象
          * */
         const { tableConfig } = props;
-        console.log('tableConfig>>', props);
+        console.log('tableConfig>>', props.buttonConfig);
         const listDataProps = Object.assign({
             // 对应字段
             data: 'data',
@@ -133,12 +141,16 @@ export default {
             listDataProps,
             tableConfig, //表格数据
             tableData: tableConfig.data,
+            buttonConfig: props.buttonConfig,
+            dialogConfig: props.dialogConfig,
             // 分页数据
             paginationSetting: {
                 [listDataProps.pageNumber]: 1, // 当前页
                 [listDataProps.pageSize]: (tableConfig && tableConfig.size) || 20, // 每页长度
             },
             totalCount: 0, // 总数
+
+            dialogVisible: {}, // dialog显示隐藏集合
         });
 
         const formRefs = ref<any>(null);
@@ -169,7 +181,7 @@ export default {
         const handleSearchVisible = () => {};
 
         watchEffect(() => {
-            console.log('watchEffect==list', props.searchConfig);
+            console.log('buttonConfig==list', state.buttonConfig);
         });
 
         /**
