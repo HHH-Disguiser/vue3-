@@ -17,12 +17,7 @@
 </template>
 
 <script>
-import {
-    reactive,
-    toRef,
-    toRefs,
-    nextTick,
-} from 'vue';
+import { reactive, toRef, toRefs, nextTick } from 'vue';
 import { getMergedObject } from '../utils/util';
 import { ElButton } from 'element-plus';
 export default {
@@ -133,6 +128,51 @@ export default {
             currentDisabled: false,
             //currentVisiable: ctx.hangdleAttrFn(props.visible),
             currentVisiable: true,
+            dialogVisible: props.dialogVisible,
+            dialogConfig: props.dialogConfig,
+            /**
+             * dialogConfig = { name: boolean }  TODO 未做
+             * */
+            handleDialogBtn: (btn, config) => {
+                const { dialogConfig, dialogVisible } = state;
+                const { target } = btn;
+                console.log('target>>>', target);
+                console.log('dialogVisible>>>>>', dialogVisible);
+                dialogVisible[target] = true;
+                const { params, url } = config;
+                ctx.emit('showDialogModal', target);
+                if (url) {
+                    // 请求获取数据
+                    this.handleBtnFetch({
+                        config,
+                        btn,
+                        callback: (res) => {
+                            // 弹窗内只有一个且是表单模块时向内填充数据
+                            const targetDialog = dialogConfig.data.find((item) => item.name === target);
+                            if (
+                                Array.isArray(targetDialog.data) &&
+                                targetDialog.data.length === 1 &&
+                                targetDialog.data[0].type === 'form'
+                            ) {
+                                const { formConfig } = targetDialog.data[0] || {};
+                                if (formConfig) this.$set(formConfig, 'results', res.data);
+                            }
+                        },
+                    });
+                } else {
+                    // 弹窗内只有一个且是表单模块时向内填充数据
+                    const targetDialog = dialogConfig.data.find((item) => item.name === target);
+                    if (
+                        Array.isArray(targetDialog.data) &&
+                        targetDialog.data.length === 1 &&
+                        targetDialog.data[0].type === 'form'
+                    ) {
+                        const { formConfig } = targetDialog.data[0] || {};
+                        console.log('formConfig>>>>>', formConfig);
+                        // if (formConfig) this.$set(formConfig, 'results', params);
+                    }
+                }
+            },
         });
 
         /**
@@ -148,8 +188,33 @@ export default {
 
         // 按钮新点击事件
         const handleBtnClick = async (btn) => {
+            console.log('btn>>>>', btn);
             const { http, scene, callback } = btn;
-            console.log('scene', scene);
+            let currentParams = '';
+            const { params, method, onBefore } = http || {};
+            // before钩子事件
+            if (onBefore) {
+                currentParams = await onBefore(btn, this);
+                // before 返回false跳出操作
+                if (currentParams === false) return;
+            } else {
+                currentParams = params;
+            }
+            // 生产配置
+            const config = {
+                url: http ? http.url : '', // 获取before处理后的before
+                params: currentParams || {},
+                method: method || 'get',
+            };
+            // 弹窗按钮，支持回显数据
+            //目前只做 弹窗模式
+            switch (scene) {
+                case 'dialog':
+                    state.handleDialogBtn(btn, config);
+                    break;
+                default:
+                    if (callback) callback(this);
+            }
         };
 
         return {

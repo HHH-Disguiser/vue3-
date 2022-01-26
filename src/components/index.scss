@@ -8,7 +8,7 @@
         padding: 22px 0 16px 16px;
         font-size: 18px;
         color: $--color-text-primary;
-       // border-bottom: 2px solid $--border-color-light;
+        // border-bottom: 2px solid $--border-color-light;
     }
 
     .list-internal-wrapper {
@@ -149,6 +149,27 @@
 
     &.list-tree .el-table td:first-of-type .cell {
         text-align: left;
+    }
+}
+
+.dialog-list-select-wrapper {
+    .dialog-footer {
+        text-align: center;
+    }
+
+    .list-show,
+    .form-item  .list-show {
+        margin-top: 15px;
+        line-height: 1.2;
+    }
+
+    .form-grid.el-row .el-form-item__content .list-show  .el-input__inner {
+        height: auto;
+    }
+
+    .form-grid.el-row .el-form-item__content .list-show .el-checkbox {
+        line-height: 1.2;
+        white-space: normal;
     }
 }
 

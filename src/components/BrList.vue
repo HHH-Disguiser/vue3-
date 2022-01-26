@@ -44,6 +44,7 @@
                     <BkButton :key="item.name || i"
                               :dialogConfig="dialogConfig"
                               :dialogVisible="dialogVisible"
+                              @showDialogModal="showDialogModal"
                               v-bind="item" />
                 </div>
             </div>
@@ -73,6 +74,13 @@
 
             </div>
         </section>
+        <!-- 弹窗区域 -->
+        <div v-if="!isEmptyObj(dialogConfig)"
+             class="dialog-wrapper">
+            <BkDialog ref="dialog"
+                      :dialog-config="dialogConfig"
+                      :dialog-visible="dialogVisible" />
+        </div>
     </div>
 </template>
 
@@ -81,12 +89,14 @@ import { reactive, ref, watchEffect, toRefs, nextTick } from 'vue';
 import MyBkForm from './BkForm.vue';
 import BkButton from './Button.vue';
 import RecursiveTitle from './RecursiveTitle.vue';
+import BkDialog from './BkDialog.vue';
 import { ElButton, ElTable, ElPagination } from 'element-plus';
-import { getMergedObject } from '../utils/util';
+import { getMergedObject, isEmptyObj } from '../utils/util';
 export default {
     name: 'BkList',
     components: {
         MyBkForm,
+        BkDialog,
         ElButton,
         ElTable,
         RecursiveTitle,
@@ -136,6 +146,7 @@ export default {
             isHasChildren: false,
             searchVisible: '', //筛选项隐藏
             getMergedObject: getMergedObject,
+            isEmptyObj: isEmptyObj,
             searchConfig: props.searchConfig,
             searchParams: {}, //当前搜索参数集合
             listDataProps,
@@ -149,8 +160,14 @@ export default {
                 [listDataProps.pageSize]: (tableConfig && tableConfig.size) || 20, // 每页长度
             },
             totalCount: 0, // 总数
-
-            dialogVisible: {}, // dialog显示隐藏集合
+            // dialog显示隐藏集合
+            dialogVisible: {},
+            /**
+             * 处理弹窗数据
+             * */
+            showDialogModal: (target: any) => {
+                state.dialogVisible[target] = true;
+            },
         });
 
         const formRefs = ref<any>(null);
@@ -181,7 +198,14 @@ export default {
         const handleSearchVisible = () => {};
 
         watchEffect(() => {
-            console.log('buttonConfig==list', state.buttonConfig);
+            console.log('dialogConfig>>>>>watch', state.dialogConfig);
+            // 初始化dialog内部表单
+            if (Array.isArray(state.dialogConfig.data)) {
+                state.dialogConfig.data.forEach((item) => {
+                    // this.$set(this.dialogVisible, item.name, false);
+                    state.dialogVisible[item.name] = false;
+                });
+            }
         });
 
         /**
@@ -194,11 +218,13 @@ export default {
             const { data, results, totalCount } = listDataProps;
         };
 
+        console.log('render===state', state);
         return {
             draw,
             handleClear,
             handleSearch,
             handleSearchVisible,
+
             formRefs,
             // toRefs() 把响应式对象转换成普通对象，里面的属性还是响应式属性
             ...toRefs(state),

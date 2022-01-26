@@ -138,44 +138,6 @@ export default {
                             },
                         ],
                     },
-                    {
-                        name: 'chooseName',
-                        extend: {
-                            title: '选择姓名',
-                            width: '1200px',
-                        },
-                        data: [
-                            {
-                                name: 'name',
-                                type: 'list',
-                                tableConfig: {
-                                    http: {
-                                        url: '/api/radio-list',
-                                        method: 'get',
-                                    },
-                                    selection: false,
-                                    radio: true,
-                                    extend: {
-                                        'reserve-selection': false,
-                                    },
-                                    data: [
-                                        {
-                                            name: 'name',
-                                            label: '姓名',
-                                        },
-                                    ],
-                                },
-                            },
-                        ],
-                        confirmButtonConfig: {
-                            label: '确认',
-                            callback: (that: any) => {
-                                // const chosen = that.$refs.name[0].tableSelection[0];
-                                // this.dialogConfig.data[0].data[0].formConfig.results = chosen;
-                                that.dialogVisible.chooseName = false;
-                            },
-                        },
-                    },
                 ],
             },
         });
